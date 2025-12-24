@@ -1,0 +1,17 @@
+networks:
+  homeasistant-network:
+    external: true
+    name: homeasistant-network
+
+services:
+  nginx:
+    container_name: homeasistant-nginx
+    image: nginx:latest
+    ports:
+      - "3290:3290"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped
+    networks:
+      - homeasistant-network
+

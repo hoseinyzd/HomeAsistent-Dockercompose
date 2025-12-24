@@ -1,0 +1,34 @@
+version: "3.3"
+
+networks:
+  homeasistant-network:
+    name: homeasistant-network
+    driver: bridge
+
+volumes:
+  homeasistant-config:
+
+services:
+  homeasistant:
+    container_name: homeasistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    cap_add:
+      - NET_ADMIN
+
+    volumes:
+      - homeasistant-config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+
+    restart: unless-stopped
+    privileged: true
+    networks:
+      - homeasistant-network
+
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.homeasistant.tls=true
+      - traefik.http.routers.homeasistant.service=homeasistant
+      - traefik.http.routers.homeasistant.rule=Host('ha.${TRAEFIK_DOMAIN}')
+      - traefik.http.services.homeasistant.loadbalancer.server.port=8123
